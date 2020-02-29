@@ -61,8 +61,8 @@ class SitemapGenerator(object):
         self.output_path = output_path
         self.context = context
         self.now = datetime.now()
-        self.siteurl = settings.get('SITEURL')
-
+        self.siteurl = re.sub(r'\/$', '', settings.get('SITEURL'))
+        
         self.default_timezone = settings.get('TIMEZONE', 'UTC')
         self.timezone = getattr(self, 'timezone', self.default_timezone)
         self.timezone = timezone(self.timezone)
@@ -167,7 +167,8 @@ class SitemapGenerator(object):
             chfreq = self.changefreqs['indexes']
 
         pageurl = '' if page.url == 'index.html' else page.url
-
+        if self.siteurl in pageurl: pageurl = pageurl.replace(self.siteurl, '')
+        pageurl = re.sub(r'^\/', '', pageurl)
         #Exclude URLs from the sitemap:
         if self.format == 'xml':
             flag = False
